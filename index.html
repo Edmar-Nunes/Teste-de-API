@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Debug API LANORT - VERSÃO 4.0</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Painel de Controle -->
+        <div class="panel">
+            <div class="panel-title">🔧 API LANORT V4.0 - CONTROLE</div>
+            
+            <div class="url-display" id="apiUrl">
+                API: https://script.google.com/macros/s/AKfycbwdvdB-oU8fK2r__4iV0996Am2kXWWQUsQO8dckyNccgbv7ekdfuOOlxtfkZte3I8fA/exec
+            </div>
+            
+            <div class="form-group">
+                <label for="apiStatus">Status da Conexão:</label>
+                <div id="apiStatus" style="padding: 8px; background: #1a1a1a; border-radius: 3px;">
+                    <span class="status-indicator status-offline" id="statusDot"></span>
+                    <span id="statusText">Testando conexão...</span>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tab-produtos')">📦 Produtos</div>
+                <div class="tab" onclick="switchTab('tab-pedidos')">🛒 Pedidos</div>
+                <div class="tab" onclick="switchTab('tab-prazos')">📅 Prazos</div>
+                <div class="tab" onclick="switchTab('tab-usuarios')">👥 Usuários</div>
+                <div class="tab" onclick="switchTab('tab-admin')">⚙️ Admin</div>
+                <div class="tab" onclick="switchTab('tab-manual')">🔧 Manual</div>
+                <div class="tab" onclick="switchTab('tab-lote')">⚡ Lote</div>
+            </div>
+            
+            <!-- Tab: Produtos -->
+            <div class="tab-content active" id="tab-produtos">
+                <div class="api-section">
+                    <div class="api-section-title">📦 TESTES DE PRODUTOS</div>
+                    
+                    <div class="quick-test">
+                        <button class="test-btn" onclick="testProdutos('todos')">📋 Todos Produtos</button>
+                        <button class="test-btn" onclick="testProdutos('buscar-codigo')">🔍 Por Código</button>
+                        <button class="test-btn" onclick="testProdutos('buscar-marca')">🏷️ Por Marca</button>
+                        <button class="test-btn" onclick="testProdutos('buscar-descricao')">📝 Por Descrição</button>
+                        <button class="test-btn" onclick="testProdutos('paginacao')">📄 Com Paginação</button>
+                        <button class="test-btn" onclick="testProdutos('codigo-barra')">📟 Por Código Barras</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prodCodigo">Código do Produto:</label>
+                        <input type="text" id="prodCodigo" placeholder="Ex: 2927">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prodMarca">Marca:</label>
+                        <input type="text" id="prodMarca" placeholder="Ex: CADIVEU">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prodDescricao">Descrição:</label>
+                        <input type="text" id="prodDescricao" placeholder="Ex: SHAMPOO">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label for="prodPagina">Página:</label>
+                            <input type="number" id="prodPagina" value="1" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="prodLimite">Limite:</label>
+                            <input type="number" id="prodLimite" value="20" min="1" max="500">
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-success" onclick="executarTesteProdutos()">▶️ Executar Teste</button>
+                        <button class="btn-warning" onclick="limparFormProdutos()">🧹 Limpar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Pedidos -->
+            <div class="tab-content" id="tab-pedidos">
+                <div class="api-section">
+                    <div class="api-section-title">🛒 TESTES DE PEDIDOS</div>
+                    
+                    <div class="quick-test">
+                        <button class="test-btn" onclick="testPedidos('listar')">📋 Listar Pedidos</button>
+                        <button class="test-btn" onclick="testPedidos('buscar-numero')">🔍 Por Número</button>
+                        <button class="test-btn" onclick="testPedidos('buscar-email')">📧 Por Email</button>
+                        <button class="test-btn" onclick="testPedidos('ultimos')">🕒 Últimos Pedidos</button>
+                        <button class="test-btn" onclick="testPedidos('add-individual')">➕ Individual</button>
+                        <button class="test-btn" onclick="testPedidos('add-lote')">⚡ Em Lote</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pedidoNumero">Número do Pedido:</label>
+                        <input type="text" id="pedidoNumero" placeholder="Ex: 0001">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pedidoEmail">Email:</label>
+                        <input type="email" id="pedidoEmail" placeholder="cliente@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pedidoLimite">Limite:</label>
+                        <input type="number" id="pedidoLimite" value="10" min="1" max="100">
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-success" onclick="executarTestePedidos()">▶️ Executar Teste</button>
+                        <button class="btn-warning" onclick="limparFormPedidos()">🧹 Limpar</button>
+                        <button class="btn-info" onclick="criarPedidoTeste()">🛠️ Criar Teste</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Prazos -->
+            <div class="tab-content" id="tab-prazos">
+                <div class="api-section">
+                    <div class="api-section-title">📅 TESTES DE PRAZOS</div>
+                    
+                    <div class="quick-test">
+                        <button class="test-btn" onclick="testPrazos('todos')">📋 Todos Prazos</button>
+                        <button class="test-btn" onclick="testPrazos('por-tipo')">🔍 Por Tipo</button>
+                        <button class="test-btn" onclick="testPrazos('por-descricao')">📝 Por Descrição</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prazoTipo">Tipo de Negociação:</label>
+                        <input type="text" id="prazoTipo" placeholder="Ex: AVISTA">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prazoDescricao">Descrição:</label>
+                        <input type="text" id="prazoDescricao" placeholder="Ex: 30DIAS">
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-success" onclick="executarTestePrazos()">▶️ Executar Teste</button>
+                        <button class="btn-warning" onclick="limparFormPrazos()">🧹 Limpar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Usuários -->
+            <div class="tab-content" id="tab-usuarios">
+                <div class="api-section">
+                    <div class="api-section-title">👥 TESTES DE USUÁRIOS</div>
+                    
+                    <div class="quick-test">
+                        <button class="test-btn" onclick="testUsuarios('todos')">📋 Todos Usuários</button>
+                        <button class="test-btn" onclick="testUsuarios('por-codigo')">🔍 Por Código</button>
+                        <button class="test-btn" onclick="testUsuarios('por-nome')">👤 Por Nome</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="usuarioCodigo">Código do Parceiro:</label>
+                        <input type="text" id="usuarioCodigo" placeholder="Ex: 123">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="usuarioNome">Nome Parceiro:</label>
+                        <input type="text" id="usuarioNome" placeholder="Ex: JOÃO">
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-success" onclick="executarTesteUsuarios()">▶️ Executar Teste</button>
+                        <button class="btn-warning" onclick="limparFormUsuarios()">🧹 Limpar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Admin -->
+            <div class="tab-content" id="tab-admin">
+                <div class="api-section">
+                    <div class="api-section-title">⚙️ FUNÇÕES ADMINISTRATIVAS</div>
+                    
+                    <div class="quick-test">
+                        <button class="test-btn" onclick="testAdmin('estatisticas')">📊 Estatísticas</button>
+                        <button class="test-btn" onclick="testAdmin('status')">🔧 Status Sistema</button>
+                        <button class="test-btn" onclick="testAdmin('teste-conexao')">🔗 Teste Conexão</button>
+                        <button class="test-btn" onclick="testAdmin('sistema-produtos')">🛍️ Sistema Produtos</button>
+                        <button class="test-btn" onclick="testAdmin('sistema-usuarios')">👥 Sistema Usuários</button>
+                        <button class="test-btn" onclick="testAdmin('sistema-prazos')">📅 Sistema Prazos</button>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-success" onclick="executarTesteAdmin()">▶️ Executar Teste</button>
+                        <button class="btn-warning" onclick="testAllEndpoints()">🚀 Testar Tudo</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab: Manual -->
+            <div class="tab-content" id="tab-manual">
+                <div class="form-group">
+                    <label for="manualRecurso">Recurso:</label>
+                    <select id="manualRecurso">
+                        <option value="produtos">produtos</option>
+                        <option value="pedidos">pedidos</option>
+                        <option value="prazos">prazos</option>
+                        <option value="usuarios">usuarios</option>
+                        <option value="parceiros">parceiros</option>
+                        <option value="estatisticas">estatisticas</option>
+                        <option value="status">status</option>
+                        <option value="teste-conexao">teste-conexao</option>
+                        <option value="sistema-produtos">sistema-produtos</option>
+                        <option value="sistema-usuarios">sistema-usuarios</option>
+                        <option value="sistema-prazos">sistema-prazos</option>
+                        <option value="ultimos-pedidos">ultimos-pedidos</option>
+                        <option value="buscar-pedido">buscar-pedido</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="manualParams">Parâmetros (JSON):</label>
+                    <textarea id="manualParams" rows="10">{
+  "codigo": "2927"
+}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="manualMethod">Método:</label>
+                    <select id="manualMethod">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="executarManual()">▶️ Executar Manual</button>
+                    <button class="btn-warning" onclick="limparManual()">🧹 Limpar</button>
+                    <button class="btn-info" onclick="preencherExemplo()">📝 Exemplo</button>
+                </div>
+            </div>
+            
+            <!-- Tab: Lote -->
+            <div class="tab-content" id="tab-lote">
+                <div class="api-section">
+                    <div class="api-section-title">⚡ TESTES EM LOTE</div>
+                    
+                    <div class="quick-test">
+                        <button class="test-btn" onclick="testLote('pedido-simples')">🛒 Pedido Simples</button>
+                        <button class="test-btn" onclick="testLote('pedido-grande')">📦 Pedido Grande</button>
+                        <button class="test-btn" onclick="testLote('performance')">⚡ Teste Performance</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loteTeste">Teste em Lote (JSON):</label>
+                        <textarea id="loteTeste" rows="15">{
+  "email": "cliente@empresa.com",
+  "numeroPedido": "TEST-" + Date.now(),
+  "usuario": "Testador API",
+  "prazo": "30 dias",
+  "observacoes": "Pedido de teste via API",
+  "itens": [
+    {
+      "codigo": "001",
+      "descricao": "Produto Teste 1",
+      "quantidade": 2,
+      "valorUnitario": 10.50,
+      "valorTotal": 21.00,
+      "numeroItem": "1"
+    },
+    {
+      "codigo": "002",
+      "descricao": "Produto Teste 2",
+      "quantidade": 1,
+      "valorUnitario": 25.00,
+      "valorTotal": 25.00,
+      "numeroItem": "2"
+    }
+  ]
+}</textarea>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-success" onclick="executarLote()">⚡ Executar Lote</button>
+                        <button class="btn-warning" onclick="limparLote()">🧹 Limpar</button>
+                        <button class="btn-info" onclick="gerarLoteTeste()">🛠️ Gerar Teste</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Painel de Resposta -->
+        <div class="panel">
+            <div class="panel-title">📡 RESPOSTA DA API</div>
+            
+            <div class="form-group">
+                <label for="responseTime">Tempo de Resposta:</label>
+                <div id="responseTime" style="padding: 8px; background: #1a1a1a; border-radius: 3px;">
+                    Aguardando execução...
+                </div>
+            </div>
+            
+            <div class="response-area" id="responseContainer">
+                <pre id="responseOutput">Nenhuma resposta ainda. Execute um teste.</pre>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn-warning" onclick="clearAllLogs()">🗑️ Limpar Logs</button>
+                <button class="btn-primary" onclick="copyResponse()">📋 Copiar Resposta</button>
+                <button class="btn-danger" onclick="exportLogs()">💾 Exportar Logs</button>
+                <button class="btn-info" onclick="limparResposta()">🧹 Limpar Resposta</button>
+            </div>
+        </div>
+        
+        <!-- Painel de Logs -->
+        <div class="panel">
+            <div class="panel-title">📝 LOGS DE DEBUG</div>
+            
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; color: #aaa; font-size: 12px;">
+                    <span>Total logs: <span id="logCount">0</span></span>
+                    <span>Última atualização: <span id="lastUpdate">--:--:--</span></span>
+                </div>
+            </div>
+            
+            <div class="log-area" id="logContainer">
+                <!-- Logs serão inseridos aqui -->
+            </div>
+        </div>
+        
+        <!-- Painel de Informações -->
+        <div class="panel">
+            <div class="panel-title">ℹ️ INFORMAÇÕES DA API</div>
+            
+            <div class="form-group">
+                <label>Endpoint Principal:</label>
+                <div class="url-display" style="font-size: 12px;">
+                    GET/POST: https://script.google.com/macros/s/AKfycbwdvdB-oU8fK2r__4iV0996Am2kXWWQUsQO8dckyNccgbv7ekdfuOOlxtfkZte3I8fA/exec
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Endpoints Disponíveis:</label>
+                <div style="color: #aaa; font-size: 12px; line-height: 1.5;">
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=produtos</strong> - Listar produtos</div>
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=pedidos</strong> - Listar pedidos</div>
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=prazos</strong> - Listar prazos</div>
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=usuarios</strong> - Listar usuários</div>
+                    <div><span class="resource-tag">POST</span> <strong>/exec?recurso=pedidos</strong> - Criar pedido</div>
+                    <div><span class="resource-tag">POST</span> <strong>/exec?recurso=pedidos-lote</strong> - Criar pedido em lote</div>
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=estatisticas</strong> - Estatísticas</div>
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=status</strong> - Status do sistema</div>
+                    <div><span class="resource-tag">GET</span> <strong>/exec?recurso=teste-conexao</strong> - Testar conexão</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Parâmetros Comuns:</label>
+                <div style="color: #aaa; font-size: 12px; line-height: 1.5;">
+                    <div><strong>codigo</strong> - Código do produto</div>
+                    <div><strong>descricao</strong> - Descrição do produto</div>
+                    <div><strong>marca</strong> - Marca do produto</div>
+                    <div><strong>pagina</strong> - Número da página</div>
+                    <div><strong>limite</strong> - Limite de registros</div>
+                    <div><strong>numeroPedido</strong> - Número do pedido</div>
+                    <div><strong>email</strong> - Email do cliente</div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn-info" onclick="testConnection()">🔄 Testar Conexão</button>
+                <button class="btn-success" onclick="exibirDocumentacao()">📚 Ver Documentação</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
