@@ -538,7 +538,21 @@ async function executarLote() {
         addLog(`⚡ Executando pedido em lote: ${pedidoData.numeroPedido}`, 'info');
         addLog(`📦 Total de itens: ${pedidoData.itens ? pedidoData.itens.length : 0}`, 'info');
         
-        await callAPI('POST', pedidoData);
+        // Primeiro tentar como POST
+        try {
+            const result = await callAPI('POST', pedidoData);
+            
+            // Se POST retornar erro, tentar como GET
+            if (result && result.sucesso === false) {
+                addLog('🔄 POST retornou erro, tentando como GET...', 'warning');
+                await callAPI('GET', pedidoData);
+            }
+            
+        } catch (error) {
+            addLog(`❌ POST falhou com exceção: ${error.message}`, 'error');
+            addLog('🔄 Tentando como GET...', 'warning');
+            await callAPI('GET', pedidoData);
+        }
         
     } catch (error) {
         addLog(`❌ Erro no JSON do lote: ${error.message}`, 'error');
@@ -613,12 +627,12 @@ async function callAPI(method, params, isBatch = false) {
     
     try {
         let url = API_URL;
-        let options = { method: method, redirect: 'follow' };
+        let options = { method: method };
         
         if (method === 'GET') {
             const queryParams = new URLSearchParams();
             Object.keys(params).forEach(key => {
-                if (params[key] !== undefined && params[key] !== null) {
+                if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
                     queryParams.append(key, params[key]);
                 }
             });
@@ -626,6 +640,15 @@ async function callAPI(method, params, isBatch = false) {
         } else if (method === 'POST') {
             options.headers = { 'Content-Type': 'application/json' };
             options.body = JSON.stringify(params);
+            
+            // Para POST também criamos URL com query params como fallback
+            const queryParams = new URLSearchParams();
+            Object.keys(params).forEach(key => {
+                if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+                    queryParams.append(key, params[key]);
+                }
+            });
+            url = `${API_URL}?${queryParams.toString()}`;
         }
         
         addLog(`🔗 ${method} ${url.substring(0, 100)}${url.length > 100 ? '...' : ''}`, 'info');
@@ -670,7 +693,52 @@ async function callAPI(method, params, isBatch = false) {
         document.getElementById('responseTime').textContent = `❌ ${responseTime}ms | ${error.message}`;
         addLog(`💥 Erro: ${error.message}`, 'error');
         
-        if (!isBatch) {
+        // Tentar como GET se POST falhou (apenas para pedidos-lote)
+        if (method === 'POST' && params.recurso === 'pedidos-lote' && !isBatch) {
+            addLog('🔄 Tentando enviar dados como GET...', 'warning');
+            
+            // Tentar novamente como GET
+            try {
+                const getParams = { ...params };
+                const queryParams = new URLSearchParams();
+                Object.keys(getParams).forEach(key => {
+                    if (getParams[key] !== undefined && getParams[key] !== null && getParams[key] !== '') {
+                        // Para arrays/itens, precisamos serializar de forma especial
+                        if (key === 'itens' && Array.isArray(getParams[key])) {
+                            queryParams.append(key, JSON.stringify(getParams[key]));
+                        } else {
+                            queryParams.append(key, getParams[key]);
+                        }
+                    }
+                });
+                const getUrl = `${API_URL}?${queryParams.toString()}`;
+                
+                addLog(`🔗 GET fallback: ${getUrl.substring(0, 100)}...`, 'info');
+                const getResponse = await fetch(getUrl);
+                const getResponseText = await getResponse.text();
+                
+                let getData;
+                try {
+                    getData = JSON.parse(getResponseText);
+                    addLog(`✅ GET funcionou!`, 'success');
+                    showResponse(getData, getResponse.ok && getData.sucesso !== false);
+                    return getData;
+                } catch (e) {
+                    showResponse({ 
+                        error: 'Falha na comunicação',
+                        message: error.message,
+                        fallbackAttempt: 'GET também falhou',
+                        getResponse: getResponseText.substring(0, 500)
+                    }, false);
+                }
+            } catch (getError) {
+                showResponse({ 
+                    error: 'Falha na comunicação POST e GET',
+                    message: error.message,
+                    getError: getError.message
+                }, false);
+            }
+        } else if (!isBatch) {
             showResponse({ 
                 error: 'Falha na comunicação',
                 message: error.message
