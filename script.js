@@ -424,12 +424,13 @@ function preencherExemplo() {
 // ========== FUNÇÕES PARA LOTE ==========
 function testLote(tipo) {
     let loteData = '';
+    const timestamp = Date.now();
     
     switch(tipo) {
         case 'pedido-simples':
             loteData = `{
   "email": "cliente@empresa.com",
-  "numeroPedido": "TEST-" + Date.now(),
+  "numeroPedido": "TEST-${timestamp}",
   "usuario": "Testador API",
   "prazo": "30 dias",
   "observacoes": "Pedido de teste via API",
@@ -457,7 +458,7 @@ function testLote(tipo) {
         case 'pedido-grande':
             loteData = `{
   "email": "grande.pedido@empresa.com",
-  "numeroPedido": "LOTE-GRANDE-" + Date.now(),
+  "numeroPedido": "LOTE-GRANDE-${timestamp}",
   "usuario": "Cliente VIP",
   "prazo": "60 dias",
   "observacoes": "Pedido grande com múltiplos itens",
@@ -484,7 +485,7 @@ function testLote(tipo) {
         case 'performance':
             loteData = `{
   "email": "performance@teste.com",
-  "numeroPedido": "PERF-" + Date.now(),
+  "numeroPedido": "PERF-${timestamp}",
   "usuario": "Teste Performance",
   "prazo": "À vista",
   "observacoes": "Teste de performance com 50 itens",
@@ -516,8 +517,21 @@ async function executarLote() {
     const loteText = document.getElementById('loteTeste').value;
     
     try {
-        // Substituir Date.now() no texto
-        const processedText = loteText.replace(/Date\.now\(\)/g, Date.now());
+        // Pré-processar o JSON para substituir qualquer expressão JavaScript
+        const preprocessJson = (jsonString) => {
+            let result = jsonString;
+            
+            // Substituir Date.now() pelo valor atual
+            if (result.includes('Date.now()')) {
+                const timestamp = Date.now();
+                // Usar expressão regular para substituir todas as ocorrências
+                result = result.replace(/Date\.now\(\)/g, timestamp);
+            }
+            
+            return result;
+        };
+        
+        const processedText = preprocessJson(loteText);
         const pedidoData = JSON.parse(processedText);
         pedidoData.recurso = 'pedidos-lote';
         
@@ -533,9 +547,10 @@ async function executarLote() {
 }
 
 function limparLote() {
+    const timestamp = Date.now();
     document.getElementById('loteTeste').value = `{
   "email": "cliente@empresa.com",
-  "numeroPedido": "TEST-" + Date.now(),
+  "numeroPedido": "TEST-${timestamp}",
   "usuario": "Testador API",
   "prazo": "30 dias",
   "observacoes": "Pedido de teste via API",
